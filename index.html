@@ -9,16 +9,58 @@
         p.plot_description {
             font-weight: bold;
         }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 2px solid #333;
+            padding: 8px;
+            text-align: left;
+        }
+        tr:hover {
+            background-color: #d1e7fd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .download-btn {
+            margin: 10px 5px;
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .download-btn:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
+
+
 <body>
-    <img src="height_age_plot.png">
+    <img id="plot-img" src="height_age_plot.png">
     <p class = "plot_description">Height age plot</p>
 
-    <div class="container">
-        <table class = "table table-bordered" id="csv-table">
-        </table>
+
+    <button class="download-btn" onclick="downloadPlot()">Download Plot (.PNG)</button>
+ 
+
+  
+
+
+
+    <div class="button-wrapper">
+        <button class="download-btn" onclick="downloadCSV()">Download Table (.CSV)</button>
     </div>
+
+    <div id="table-container">
+        <table id="csv-table"></table>
+    </div>
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <script>
@@ -29,10 +71,11 @@
             Papa.parse(csvUrl, {
                 download:true,
                 header:true,
-                complete:(results) => {
-                    console.log(results)
+                complete:function(results) {
+                    console.log(results.data)
 
                     table.innerHTML = "";
+
                     const headers = results.meta.fields;
                     const thead = document.createElement('thead');
                     const tr = document.createElement('tr');
@@ -59,6 +102,31 @@
                 table.appendChild(tbody);
             }
         });
+
+            function downloadCSV() {
+            Papa.parse(csvUrl, {
+                download: true,
+                complete: function(results){
+                    const csv = Papa.unparse(results.data);
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = 'height_age.csv';
+                    link.click();
+                }
+            });
+        }
+
+
+
+        function downloadPlot() {
+            const link = document.createElement('a');
+            link.href = document.getElementById('plot-img').src;
+            link.download = 'height_age_plot.png';
+            link.click();
+        }
+
+
 
 
     </script>
